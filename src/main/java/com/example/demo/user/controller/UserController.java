@@ -6,6 +6,7 @@ import com.example.demo.user.dto.UserResponseDto;
 import com.example.demo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Parameter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,12 @@ public class UserController {
     }
 
     @GetMapping("/v1")
-    public ResponseEntity<ApiResult<Page<UserResponseDto>>> getUser(Pageable pageable) {
+    public ResponseEntity<ApiResult<Page<UserResponseDto>>> getUsers(Pageable pageable) {
         return ResponseEntity.ok(ApiResult.success(userService.getUsers(pageable)));
+    }
+
+    @GetMapping("/v1/detail")
+    public ResponseEntity<ApiResult<UserResponseDto>> getUserDetail(@RequestParam("id") Long id) {
+        return ResponseEntity.ok(ApiResult.success(userService.getUser(id)));
     }
 }
