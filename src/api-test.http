@@ -1,0 +1,9 @@
+### 유저 회원가입
+POST http://localhost:8080/api/users/v1/create
+Content-Type: application/json
+
+{
+  "email": "test9999@email.com",
+  "password": "password",
+  "username": "홍길동"
+}
