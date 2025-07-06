@@ -43,4 +43,17 @@ public class UserService {
             throw new UserException(UserErrorCode.DUPLICATED_USER_EMAIL);
         });
     }
+
+    /**
+     * 유저 목록 조회
+     * @param pageable
+     * @return
+     */
+    public Page<UserResponseDto> getUsers(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+        List<UserResponseDto> userDtoList = userPage.getContent().stream()
+                .map(UserResponseDto::from)
+                .collect(Collectors.toList());
+        return new PageImpl<>(userDtoList, pageable, userPage.getTotalElements());
+    }
 }

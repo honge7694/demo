@@ -6,6 +6,8 @@ import com.example.demo.user.dto.UserResponseDto;
 import com.example.demo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,5 +22,10 @@ public class UserController {
     @PostMapping("/v1/create")
     public ResponseEntity<ApiResult<UserResponseDto>> registerUser(@RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(ApiResult.success(userService.registerUser(userRequestDto)));
+    }
+
+    @GetMapping("/v1")
+    public ResponseEntity<ApiResult<Page<UserResponseDto>>> getUser(Pageable pageable) {
+        return ResponseEntity.ok(ApiResult.success(userService.getUsers(pageable)));
     }
 }

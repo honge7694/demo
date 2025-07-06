@@ -3,7 +3,15 @@ POST http://localhost:8080/api/users/v1/create
 Content-Type: application/json
 
 {
-  "email": "test9999@email.com",
+  "email": "test3333@email.com",
   "password": "password",
-  "username": "홍길동"
+  "username": "가나다"
 }
+
+### 유저 목록 조회 sort: name (가,나,다 순)
+GET http://localhost:8080/api/users/v1?size=2&sort=name,asc
+### 유저 목록 조회 sort: view count(조회순)
+GET http://localhost:8080/api/users/v1?size=2&sort=viewCount,desc
+### 유저 목록 조회 sort: id, desc (등록 최신순)
+GET http://localhost:8080/api/users/v1?size=2&sort=id,desc
+
