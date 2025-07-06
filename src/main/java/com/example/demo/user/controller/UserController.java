@@ -30,8 +30,8 @@ public class UserController {
         return ResponseEntity.ok(ApiResult.success(userService.getUsers(pageable)));
     }
 
-    @GetMapping("/v1/detail")
-    public ResponseEntity<ApiResult<UserResponseDto>> getUserDetail(@RequestParam("id") Long id) {
+    @PostMapping("/v1/detail/{id}")
+    public ResponseEntity<ApiResult<UserResponseDto>> getUserDetail(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResult.success(userService.getUser(id)));
     }
 }

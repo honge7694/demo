@@ -16,5 +16,5 @@ GET http://localhost:8080/api/users/v1?size=2&sort=viewCount,desc
 GET http://localhost:8080/api/users/v1?size=2&sort=id,desc
 
 ### 유저 상세 조회
-GET http://localhost:8080/api/users/v1/detail?id=4
+POST http://localhost:8080/api/users/v1/detail/4
 
