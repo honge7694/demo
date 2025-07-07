@@ -18,3 +18,23 @@ GET http://localhost:8080/api/users/v1?size=2&sort=id,desc
 ### 유저 상세 조회
 POST http://localhost:8080/api/users/v1/detail/4
 
+### 포인트 충전 요청
+POST http://localhost:8080/api/payments/charge/request
+Content-Type: application/json
+
+{
+  "userId": 4,
+  "amount": 10000
+}
+
+### 포인트 충전 확인
+POST http://localhost:8080/api/payments/confirm
+Content-Type: application/json
+
+{
+  "userId": 4,
+  "orderId": "f9103697-fb3b-4990-81ee-bf110ea71604",
+  "amount": 10000,
+  "paymentKey": "TEST"
+}
+

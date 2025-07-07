@@ -49,4 +49,9 @@ public class User {
     public static User of(String email, String password, String name) {
         return new User(email, password, name);
     }
+
+    /* 비즈니스 로직*/
+    public void addPoint(int amount) {
+        balance += amount;
+    }
 }
