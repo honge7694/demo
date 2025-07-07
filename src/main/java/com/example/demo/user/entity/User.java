@@ -50,7 +50,7 @@ public class User {
     }
 
     /* 비즈니스 로직*/
-    public void addPoint(int amount) {
+    public void addPoint(Long amount) {
         balance += amount;
     }
 }

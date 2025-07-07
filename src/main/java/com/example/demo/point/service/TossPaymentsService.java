@@ -1,5 +1,11 @@
 package com.example.demo.point.service;
 
+import com.example.demo.coupon.entity.Coupon;
+import com.example.demo.coupon.entity.FixedAmountDiscountCoupon;
+import com.example.demo.coupon.entity.PercentageDiscountCoupon;
+import com.example.demo.coupon.exception.CouponErrorCode;
+import com.example.demo.coupon.exception.CouponException;
+import com.example.demo.coupon.repository.CouponRepository;
 import com.example.demo.point.PointHistoryRepository;
 import com.example.demo.point.dto.PointChargeRequestDto;
 import com.example.demo.point.dto.PointChargeResponseDto;
@@ -36,6 +42,7 @@ public class TossPaymentsService {
 
     private final UserRepository userRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final CouponRepository couponRepository;
 
     @Transactional
     public PointChargeResponseDto requestCharge(PointChargeRequestDto requestDto) {
@@ -43,12 +50,31 @@ public class TossPaymentsService {
 
         // 고유한 orderID 생성
         String orderId = UUID.randomUUID().toString();
-        int amount = requestDto.getAmount();
+
+        // 쿠폰 금액 계산
+        Long originalAmount = requestDto.getAmount();
+        Long discountAmount = 0L;
+
+        if (requestDto.getCouponId() != null) {
+            Coupon coupon = couponRepository.findById(requestDto.getCouponId())
+                    .orElseThrow(() -> new CouponException(CouponErrorCode.COUPON_NOT_FOUND));
+            if (coupon instanceof FixedAmountDiscountCoupon) {
+                discountAmount = coupon.calculateDiscountAmount(originalAmount);
+            } else if (coupon instanceof PercentageDiscountCoupon) {
+                discountAmount = coupon.calculateDiscountAmount(originalAmount);
+            }
+        }
+
+        // 최종 금액 계산
+        Long finalAmount = originalAmount - discountAmount;
+        if (finalAmount < 0) {
+            finalAmount = 0L;
+        }
 
         // pointHistory 생성
-        PointHistory pointHistory = PointHistory.of(user, amount, orderId);
+        PointHistory pointHistory = PointHistory.of(user, originalAmount, discountAmount, finalAmount, orderId);
         pointHistoryRepository.save(pointHistory);
-        return new PointChargeResponseDto(user.getId(), orderId, amount);
+        return new PointChargeResponseDto(user.getId(), orderId, originalAmount, discountAmount, finalAmount);
     }
 
     @Transactional
@@ -56,7 +82,7 @@ public class TossPaymentsService {
         JSONParser parser = new JSONParser();
         String orderId;
         Long userId;
-        int amount;
+        Long amount;
         String paymentKey;
         try {
             // 클라이언트에서 받은 JSON 요청 바디입니다.
@@ -64,13 +90,12 @@ public class TossPaymentsService {
             paymentKey = (String) requestData.get("paymentKey");
             userId = (Long) requestData.get("userId");
             orderId = (String) requestData.get("orderId");
-            amount = ((Long) requestData.get("amount")).intValue();
+            amount = ((Long) requestData.get("amount"));
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
         JSONObject obj = new JSONObject();
-//        obj.put("userId", userId);
         obj.put("orderId", orderId);
         obj.put("amount", amount);
         obj.put("paymentKey", paymentKey);
@@ -80,8 +105,8 @@ public class TossPaymentsService {
                 .orElseThrow(() -> new PointException(PointErrorCode.NOT_FOUND_POINT_HISTORY));
 
         // 요청 금액과 실제 금액이 일치하는지 확인
-        if (pointHistory.getAmount() != amount) {
-            log.error("요청 금액 : {}, 실제 금액: {}", pointHistory.getAmount(), amount);
+        if (!pointHistory.getFinalAmount().equals(amount)) {
+            log.error("요청 금액 : {}, 실제 금액: {}", pointHistory.getOriginalAmount(), amount);
             throw new PointException(PointErrorCode.BAD_REQUEST_POINT);
         }
 
@@ -112,9 +137,9 @@ public class TossPaymentsService {
         responseStream.close();
 
         if (isSuccess) {
-            log.info("결제 성공, 주문 ID: {}, 금액: {}", orderId, amount);
+            log.info("결제 성공, 주문 ID: {}, 금액: {}", orderId, pointHistory.getFinalAmount());
             User user = findByUserId(userId);
-            user.addPoint(amount);
+            user.addPoint(pointHistory.getFinalAmount());
 
             // 결제 상태 변경
             pointHistory.updateOnSuccess(paymentKey);
@@ -129,7 +154,6 @@ public class TossPaymentsService {
                 default:
                     throw new PointException(PointErrorCode.PAYMENT_GATEWAY_UNAVAILABLE);
             }
-
         }
 
         return jsonObject;

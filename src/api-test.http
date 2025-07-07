@@ -45,7 +45,8 @@ Content-Type: application/json
 
 {
   "userId": 1,
-  "amount": 10000
+  "couponId": 1,
+  "amount": 100000
 }
 
 ### 포인트 충전 확인
@@ -54,8 +55,8 @@ Content-Type: application/json
 
 {
   "userId": 1,
-  "orderId": "f9103697-fb3b-4990-81ee-bf110ea71604",
-  "amount": 10000,
+  "orderId": "fadbe7e2-e4b6-4ef2-aadc-2be0c5f1ffdf",
+  "amount": 95000,
   "paymentKey": "TEST"
 }
 
