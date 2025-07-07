@@ -1,6 +1,7 @@
 package com.example.demo.common.exception;
 
 import com.example.demo.common.config.response.ApiResult;
+import com.example.demo.coupon.exception.CouponException;
 import com.example.demo.point.exception.PointException;
 import com.example.demo.user.exception.UserException;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +23,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(e.getPointErrorCode().getHttpStatus())
                 .body(ApiResult.error(e.getPointErrorCode().getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(value = CouponException.class)
+    public ResponseEntity<ApiResult<Void>> handlerCouponException(CouponException e) {
+        return ResponseEntity
+                .status(e.getCouponErrorCode().getHttpstatus())
+                .body(ApiResult.error(e.getCouponErrorCode().getCode(), e.getMessage()));
     }
 }
