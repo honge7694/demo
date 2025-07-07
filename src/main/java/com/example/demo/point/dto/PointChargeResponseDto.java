@@ -10,5 +10,7 @@ import lombok.NoArgsConstructor;
 public class PointChargeResponseDto {
     private Long userId;
     private String orderId;
-    private int amount;
+    private Long originalAmount;
+    private Long discountAmount;
+    private Long finalAmount;
 }

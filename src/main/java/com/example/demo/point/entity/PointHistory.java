@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +24,14 @@ public class PointHistory {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private long amount;
+    @Column(nullable = false)
+    private Long originalAmount;
+
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private Long discountAmount;
+
+    private Long finalAmount;
 
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
@@ -35,16 +43,18 @@ public class PointHistory {
 
     private LocalDateTime createdAt;
 
-    public PointHistory(User user, int amount, String orderId) {
+    protected PointHistory(User user, Long originalAmount, Long discountAmount, Long finalAmount, String orderId) {
         this.user = user;
-        this.amount = amount;
+        this.originalAmount = originalAmount;
+        this.discountAmount = discountAmount;
+        this.finalAmount = finalAmount;
         this.status = TransactionStatus.PENDING;
         this.orderId = orderId;
         this.createdAt = LocalDateTime.now();
     }
 
-    public static PointHistory of(User user, int amount, String orderId) {
-        return new PointHistory(user, amount, orderId);
+    public static PointHistory of(User user, Long originalAmount, Long discountAmount, Long finalAmount, String orderId) {
+        return new PointHistory(user, originalAmount, discountAmount, finalAmount, orderId);
     }
 
     /* 비즈니스 로직 */

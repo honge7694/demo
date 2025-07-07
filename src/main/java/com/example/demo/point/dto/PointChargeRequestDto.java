@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class PointChargeRequestDto {
     private Long userId;
-    private int amount;
+    private Long amount;
+    private Long couponId;
 }
