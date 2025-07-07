@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "tb_user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class User {
@@ -38,7 +37,7 @@ public class User {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    public User(String email, String password, String name) {
+    protected User(String email, String password, String name) {
         this.email = email;
         this.password = password;
         this.name = name;
